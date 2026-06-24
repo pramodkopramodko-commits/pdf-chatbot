@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Chatbot</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- ── Sidebar ─────────────────────────────────── -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="logo">📄 PDF Chat</span>
+      </div>
+
+      <!-- Upload -->
+      <section class="sidebar-section">
+        <h3 class="sidebar-label">Documents</h3>
+        <div class="dropzone" id="dropzone">
+          <span class="dropzone-icon">⬆</span>
+          <span>Drop PDFs here or <u>browse</u></span>
+          <input type="file" id="file-input" accept="application/pdf" multiple hidden />
+        </div>
+        <div id="upload-status" class="upload-status"></div>
+        <ul id="document-list" class="document-list"></ul>
+      </section>
+
+      <!-- New chat -->
+      <section class="sidebar-section">
+        <h3 class="sidebar-label">Session</h3>
+        <div id="session-info" class="session-info">No active session</div>
+        <button id="new-chat-btn" class="btn-secondary full-width">＋ New Chat</button>
+        <div class="provider-badge" id="provider-badge">…</div>
+      </section>
+    </aside>
+
+    <!-- ── Main chat area ──────────────────────────── -->
+    <main class="chat-main">
+      <div class="chat-messages" id="chat-messages">
+        <div class="welcome-screen" id="welcome-screen">
+          <div class="welcome-icon">🤖</div>
+          <h2>PDF Chatbot</h2>
+          <p>Upload a PDF, then ask questions about its contents.<br>
+             Answers are grounded in your documents with page citations.</p>
+          <button class="btn-primary" id="welcome-start-btn">Start chatting</button>
+        </div>
+      </div>
+
+      <!-- Sources panel (slides in from right) -->
+      <div class="sources-panel" id="sources-panel">
+        <div class="sources-header">
+          <span>Sources</span>
+          <button class="btn-icon" id="close-sources-btn" title="Close">✕</button>
+        </div>
+        <div id="sources-list"></div>
+      </div>
+
+      <!-- Input bar -->
+      <div class="input-bar">
+        <textarea
+          id="chat-input"
+          class="chat-input"
+          placeholder="Ask a question about your documents… (Enter to send, Shift+Enter for newline)"
+          rows="1"
+          disabled
+        ></textarea>
+        <button id="send-btn" class="btn-send" disabled title="Send (Enter)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

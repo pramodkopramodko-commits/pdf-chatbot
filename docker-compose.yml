@@ -1,0 +1,45 @@
+version: "3.9"
+
+# ── Local development with Docker Compose ─────────────────────────────────────
+#
+# Usage:
+#   cp backend/.env.example backend/.env   # fill in API keys
+#   docker compose up --build
+#   open http://localhost:8000
+#
+# Storage (uploads + ChromaDB) is mounted as named volumes so data survives
+# container restarts without needing to re-upload PDFs or re-index chunks.
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime        # use the final runtime stage
+    image: pdf-chatbot:local
+    container_name: pdf-chatbot
+    ports:
+      - "8000:8000"          # host:container
+    env_file:
+      - backend/.env         # OPENAI_API_KEY, LLM_PROVIDER, etc.
+    environment:
+      - ENV=development
+      - PORT=8000
+    volumes:
+      # Persist uploads and ChromaDB across restarts
+      - uploads:/home/appuser/app/backend/storage/uploads
+      - chroma:/home/appuser/app/backend/storage/chroma
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  uploads:
+    driver: local
+  chroma:
+    driver: local

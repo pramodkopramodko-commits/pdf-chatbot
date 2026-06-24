@@ -1,0 +1,68 @@
+# render.yaml — Render deployment blueprint
+#
+# This file lets Render auto-detect the service when you connect your GitHub repo.
+# Render docs: https://render.com/docs/blueprint-spec
+#
+# Deploy steps:
+#   1. Push this repo to GitHub (make it public, or give Render access).
+#   2. Go to https://dashboard.render.com → New → Blueprint.
+#   3. Connect your repo — Render finds this file automatically.
+#   4. Add your secret env vars in the Render dashboard:
+#        OPENAI_API_KEY   → your key
+#        ANTHROPIC_API_KEY (optional)
+#   5. Click "Apply" — Render builds the Docker image and deploys.
+#
+# Persistent disk:
+#   ChromaDB and uploaded PDFs live in /data (a 1 GB persistent disk).
+#   Without a disk, storage resets on every deploy — the disk prevents that.
+#   Note: persistent disks require a paid Render plan.
+#   Free-tier users: storage resets on redeploy; re-upload PDFs after each deploy.
+
+services:
+  - type: web
+    name: pdf-chatbot
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+
+    # Render injects PORT automatically; our CMD uses $PORT
+    envVars:
+      - key: ENV
+        value: production
+      - key: OPENAI_API_KEY
+        sync: false          # mark as secret — set in Render dashboard
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: LLM_PROVIDER
+        value: openai        # change to "anthropic" if preferred
+      - key: OPENAI_CHAT_MODEL
+        value: gpt-4o-mini
+      - key: ANTHROPIC_CHAT_MODEL
+        value: claude-sonnet-4-6
+      - key: EMBEDDING_MODEL
+        value: text-embedding-3-small
+      - key: COLLECTION_NAME
+        value: pdf_documents
+      - key: CHUNK_SIZE
+        value: "1000"
+      - key: CHUNK_OVERLAP
+        value: "200"
+      - key: TOP_K
+        value: "4"
+      - key: MAX_UPLOAD_SIZE_MB
+        value: "50"
+      # Point storage at the persistent disk mount path
+      - key: UPLOAD_DIR
+        value: /data/uploads
+      - key: CHROMA_DIR
+        value: /data/chroma
+
+    # 1 GB persistent disk — keeps uploads + ChromaDB across deploys
+    # Remove this block if you are on the free tier (storage will reset on redeploy)
+    disk:
+      name: pdf-chatbot-data
+      mountPath: /data
+      sizeGB: 1
+
+    healthCheckPath: /api/health
+    autoDeploy: true
