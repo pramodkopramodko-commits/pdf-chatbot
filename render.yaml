@@ -52,17 +52,9 @@ services:
       - key: MAX_UPLOAD_SIZE_MB
         value: "50"
       # Point storage at the persistent disk mount path
-      - key: UPLOAD_DIR
-        value: /data/uploads
-      - key: CHROMA_DIR
-        value: /data/chroma
 
     # 1 GB persistent disk — keeps uploads + ChromaDB across deploys
     # Remove this block if you are on the free tier (storage will reset on redeploy)
-    disk:
-      name: pdf-chatbot-data
-      mountPath: /data
-      sizeGB: 1
 
     healthCheckPath: /api/health
     autoDeploy: true
